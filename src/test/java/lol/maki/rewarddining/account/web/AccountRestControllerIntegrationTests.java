@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @TestPropertySource(properties = { "management.metrics.export.wavefront.enabled=false", "logging.level.web=DEBUG", "logging.level.sql=TRACE" })
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-class AccountRestControllerIntegrationTest {
+class AccountRestControllerIntegrationTests {
 	@Autowired
 	TestRestTemplate restTemplate;
 

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class AccountRestControllerTest {
+class AccountRestControllerTests {
 	AccountRestController controller = new AccountRestController(new StubAccountManager());
 
 
