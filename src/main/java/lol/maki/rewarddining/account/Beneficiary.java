@@ -36,7 +36,7 @@ public class Beneficiary {
 	 * @param savings the total amount saved to-date for this beneficiary
 	 */
 	@JsonCreator
-	Beneficiary(String name, Percentage allocationPercentage, MonetaryAmount savings) {
+	public Beneficiary(String name, Percentage allocationPercentage, MonetaryAmount savings) {
 		this.name = name;
 		this.allocationPercentage = allocationPercentage;
 		this.savings = savings;

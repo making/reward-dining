@@ -1,9 +1,14 @@
-package lol.maki.rewarddining.restaurant;
+package lol.maki.rewarddining.restaurant.infrastructure;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import lol.maki.rewarddining.account.Percentage;
+import lol.maki.rewarddining.restaurant.AlwaysAvailable;
+import lol.maki.rewarddining.restaurant.BenefitAvailabilityPolicy;
+import lol.maki.rewarddining.restaurant.NeverAvailable;
+import lol.maki.rewarddining.restaurant.Restaurant;
+import lol.maki.rewarddining.restaurant.RestaurantRepository;
 import lol.maki.rewarddining.util.FileLoader;
 
 import org.springframework.jdbc.core.JdbcTemplate;

@@ -6,7 +6,7 @@ import lol.maki.rewarddining.account.Account;
  * A benefit availabilty policy that returns true at all times.
  */
 public class AlwaysAvailable implements BenefitAvailabilityPolicy {
-	static final BenefitAvailabilityPolicy INSTANCE = new AlwaysAvailable();
+	public static final BenefitAvailabilityPolicy INSTANCE = new AlwaysAvailable();
 
 	public boolean isBenefitAvailableFor(Account account, Dining dining) {
 		return true;

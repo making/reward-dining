@@ -1,4 +1,4 @@
-package lol.maki.rewarddining.account;
+package lol.maki.rewarddining.account.infrastructure;
 
 import java.math.BigDecimal;
 import java.sql.PreparedStatement;
@@ -13,6 +13,11 @@ import java.util.stream.Collectors;
 
 import javax.money.MonetaryAmount;
 
+import lol.maki.rewarddining.account.Account;
+import lol.maki.rewarddining.account.AccountRepository;
+import lol.maki.rewarddining.account.Beneficiary;
+import lol.maki.rewarddining.account.Percentage;
+import lol.maki.rewarddining.account.USD;
 import lol.maki.rewarddining.util.FileLoader;
 
 import org.springframework.dao.DataAccessException;

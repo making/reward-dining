@@ -1,4 +1,4 @@
-package lol.maki.rewarddining.reward;
+package lol.maki.rewarddining.reward.infrastructure;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -6,6 +6,8 @@ import java.time.LocalDate;
 
 import lol.maki.rewarddining.account.AccountContribution;
 import lol.maki.rewarddining.restaurant.Dining;
+import lol.maki.rewarddining.reward.RewardConfirmation;
+import lol.maki.rewarddining.reward.RewardRepository;
 import lol.maki.rewarddining.util.FileLoader;
 
 import org.springframework.jdbc.core.JdbcTemplate;

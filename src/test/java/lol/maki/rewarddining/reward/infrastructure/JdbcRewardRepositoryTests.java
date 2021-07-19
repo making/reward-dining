@@ -1,4 +1,4 @@
-package lol.maki.rewarddining.reward;
+package lol.maki.rewarddining.reward.infrastructure;
 
 import java.math.BigDecimal;
 import java.sql.Date;
@@ -10,6 +10,7 @@ import lol.maki.rewarddining.account.AccountContribution;
 import lol.maki.rewarddining.account.Percentage;
 import lol.maki.rewarddining.account.USD;
 import lol.maki.rewarddining.restaurant.Dining;
+import lol.maki.rewarddining.reward.RewardConfirmation;
 import org.javamoney.moneta.Money;
 import org.junit.jupiter.api.Test;
 

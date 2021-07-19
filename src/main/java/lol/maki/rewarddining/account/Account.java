@@ -186,7 +186,7 @@ public class Account {
 	 * this account.
 	 * @param beneficiary the beneficiary
 	 */
-	void restoreBeneficiary(Beneficiary beneficiary) {
+	public void restoreBeneficiary(Beneficiary beneficiary) {
 		beneficiaries.add(beneficiary);
 	}
 

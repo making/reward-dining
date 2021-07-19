@@ -1,8 +1,14 @@
-package lol.maki.rewarddining.account;
+package lol.maki.rewarddining.account.infrastructure;
 
 import javax.money.MonetaryAmount;
 import javax.sql.DataSource;
 
+import lol.maki.rewarddining.account.Account;
+import lol.maki.rewarddining.account.AccountRepository;
+import lol.maki.rewarddining.account.Beneficiary;
+import lol.maki.rewarddining.account.Percentage;
+import lol.maki.rewarddining.account.USD;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +46,8 @@ class JdbcAccountRepositoryTests {
 
 		Beneficiary b1 = account.getBeneficiary("Annabelle");
 		assertNotNull(b1, "Annabelle should be a beneficiary");
-		assertEquals(USD.valueOf("0.00"), b1.getSavings(), "wrong savings");
-		assertEquals(Percentage.valueOf("50%"), b1.getAllocationPercentage(), "wrong allocation percentage");
+		Assertions.assertEquals(USD.valueOf("0.00"), b1.getSavings(), "wrong savings");
+		Assertions.assertEquals(Percentage.valueOf("50%"), b1.getAllocationPercentage(), "wrong allocation percentage");
 
 		Beneficiary b2 = account.getBeneficiary("Corgan");
 		assertNotNull(b2, "Corgan should be a beneficiary");
