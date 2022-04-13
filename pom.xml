@@ -18,7 +18,7 @@
 		<repackage.classifier/>
 		<spring-cloud.version>2020.0.4</spring-cloud.version>
 		<spring-native.version>0.10.1</spring-native.version>
-		<testcontainers.version>1.16.2</testcontainers.version>
+		<testcontainers.version>1.17.0</testcontainers.version>
 		<wavefront.version>2.2.2</wavefront.version>
 	</properties>
 	<dependencies>
