@@ -33,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.mvcMatchers("/edit*").hasRole("EDITOR")
 				.mvcMatchers("/accountDetails", "/accountList").hasAnyRole("VIEWER", "EDITOR")
 				.mvcMatchers("/accounts/**").permitAll() // TODO
+				.mvcMatchers("/actuator/**").permitAll() // TODO
 				.mvcMatchers("/**").authenticated()
 				.and()
 				.csrf().ignoringAntMatchers("/accounts/**") // TODO
