@@ -1,24 +1,19 @@
 package lol.maki.rewarddining.config;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.filter.CommonsRequestLoggingFilter;
 
 @Configuration
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-	@Override
-	public void configure(WebSecurity web) throws Exception {
-		web.debug(false).ignoring().mvcMatchers("/resources/**");
-	}
-
-
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
+public class SecurityConfig {
+	@Bean
+	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
 				.addFilterBefore(commonsRequestLoggingFilter(), CsrfFilter.class)
 				.formLogin()
@@ -41,19 +36,25 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.logout()
 				.permitAll()
 				.logoutSuccessUrl("/");
+		return http.build();
 	}
 
-	@Override
-	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth
-				.inMemoryAuthentication()
-				.withUser("vince")
-				.password("{noop}vince")
-				.roles("VIEWER")
-				.and()
-				.withUser("edith")
-				.password("{noop}edith")
-				.roles("EDITOR");
+	@Bean
+	public WebSecurityCustomizer webSecurityCustomizer() {
+		return (web) -> web.debug(false).ignoring().mvcMatchers("/resources/**");
+	}
+
+	@Bean
+	public InMemoryUserDetailsManager userDetailsService() {
+		return new InMemoryUserDetailsManager(
+				User.withUsername("vince")
+						.password("{noop}vince")
+						.roles("VIEWER")
+						.build(),
+				User.withUsername("edith")
+						.password("{noop}edith")
+						.roles("EDITOR")
+						.build());
 	}
 
 	CommonsRequestLoggingFilter commonsRequestLoggingFilter() {
