@@ -8,6 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.money.MonetaryAmount;
 
 import am.ik.yavi.builder.ValidatorBuilder;
+import am.ik.yavi.core.ConstraintViolationsException;
 import am.ik.yavi.core.Validator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lol.maki.rewarddining.account.AccountContribution.Distribution;
@@ -112,7 +113,7 @@ public class Account {
 			try {
 				totalPercentage = totalPercentage.add(b.getAllocationPercentage());
 			}
-			catch (IllegalArgumentException e) {
+			catch (ConstraintViolationsException e) {
 				// total would have been over 100% - return invalid
 				return false;
 			}

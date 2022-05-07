@@ -2,7 +2,10 @@ package lol.maki.rewarddining.account;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
+import am.ik.yavi.arguments.BigDecimalValidator;
+import am.ik.yavi.builder.BigDecimalValidatorBuilder;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
@@ -17,6 +20,10 @@ public class Percentage implements Serializable {
 
 	private BigDecimal value;
 
+	static BigDecimalValidator<BigDecimal> validator = BigDecimalValidatorBuilder
+			.of("value", c -> c.greaterThanOrEqual(BigDecimal.ZERO).lessThanOrEqual(BigDecimal.ONE))
+			.build(v -> v.setScale(2, RoundingMode.HALF_UP));
+
 	/**
 	 * Create a new percentage from the specified value. Value must be between 0 and 1. For example, value .45
 	 * represents 45%. If the value has more than two digits past the decimal point it will be rounded up. For example,
@@ -26,7 +33,7 @@ public class Percentage implements Serializable {
 	 */
 	@JsonCreator
 	public Percentage(BigDecimal value) {
-		initValue(value);
+		this.value = validator.validated(value);
 	}
 
 	/**
@@ -37,19 +44,11 @@ public class Percentage implements Serializable {
 	 * @throws IllegalArgumentException if the value is not between 0 and 1
 	 */
 	public Percentage(double value) {
-		initValue(BigDecimal.valueOf(value));
+		this.value = validator.validated(BigDecimal.valueOf(value));
 	}
 
 	@SuppressWarnings("unused")
 	private Percentage() {
-	}
-
-	private void initValue(BigDecimal value) {
-		value = value.setScale(2, BigDecimal.ROUND_HALF_UP);
-		if (value.compareTo(BigDecimal.ZERO) == -1 || value.compareTo(BigDecimal.ONE) == 1) {
-			throw new IllegalArgumentException("Percentage value must be between 0 and 1; your value was " + value);
-		}
-		this.value = value;
 	}
 
 	/**
