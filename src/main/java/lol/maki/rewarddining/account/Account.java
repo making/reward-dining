@@ -7,9 +7,15 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.money.MonetaryAmount;
 
+import am.ik.yavi.arguments.Arguments1;
+import am.ik.yavi.arguments.Arguments3Validator;
+import am.ik.yavi.arguments.ArgumentsValidators;
+import am.ik.yavi.arguments.LongValidator;
+import am.ik.yavi.builder.StringValidatorBuilder;
 import am.ik.yavi.builder.ValidatorBuilder;
+import am.ik.yavi.core.ConstraintGroup;
 import am.ik.yavi.core.ConstraintViolationsException;
-import am.ik.yavi.core.Validator;
+import am.ik.yavi.core.Validated;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lol.maki.rewarddining.account.AccountContribution.Distribution;
 
@@ -25,23 +31,45 @@ import lol.maki.rewarddining.account.AccountContribution.Distribution;
 public class Account {
 	private Long id;
 
-	private String number;
+	private final String number;
 
-	private String name;
+	private final String name;
 
 	private final Set<Beneficiary> beneficiaries = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
-	public static final Validator<Account> validator = ValidatorBuilder.<Account>of()
-			.constraint(Account::getNumber, "number", c -> c.notBlank().pattern("[0-9]{9}").message("\"{0}\" must be a 9 digit number"))
-			.constraint(Account::getName, "name", c -> c.notBlank().lessThanOrEqual(50))
-			.build();
+	static final ConstraintGroup UPDATE = ConstraintGroup.of("UPDATE");
+
+	public static final Arguments3Validator<Long, String, String, Account> accountValidator = ArgumentsValidators.split(
+					/* TODO: Update after 0.11.3 */
+					new LongValidator<>(ValidatorBuilder
+							.<Arguments1<Long>>of()
+							.constraintOnGroup(UPDATE, b -> b._long(Arguments1::arg1, "id", c -> c.notNull()))
+							._long(Arguments1::arg1, "id", c -> c.greaterThanOrEqual(0L))
+							.build(), x -> x),
+					StringValidatorBuilder
+							.of("number", c -> c.notBlank().pattern("[0-9]{9}").message("\"{0}\" must be a 9 digit number"))
+							.build(),
+					StringValidatorBuilder
+							.of("name", c -> c.notBlank().lessThanOrEqual(50))
+							.build())
+			.apply(Account::new);
+
+	public static Validated<Account> forCreate(String number, String name) {
+		return accountValidator.validate(null, number, name);
+	}
+
+	public static Validated<Account> forUpdate(Long id, String number, String name) {
+		return accountValidator.validate(id, number, name, UPDATE);
+	}
 
 	/**
 	 * Create a new account.
+	 * @param id the account id
 	 * @param number the account number
 	 * @param name the name on the account
 	 */
-	public Account(String number, String name) {
+	public Account(Long id, String number, String name) {
+		this.id = id;
 		this.number = number;
 		this.name = name;
 	}
@@ -61,19 +89,11 @@ public class Account {
 		return number;
 	}
 
-	public void setNumber(String number) {
-		this.number = number;
-	}
-
 	/**
 	 * Returns the name on file for this account.
 	 */
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	/**
@@ -192,6 +212,6 @@ public class Account {
 	}
 
 	public String toString() {
-		return "Number = '" + number + "', name = " + name + "', beneficiaries = " + beneficiaries;
+		return "id = " + id + ", number = '" + number + "', name = " + name + "', beneficiaries = " + beneficiaries;
 	}
 }

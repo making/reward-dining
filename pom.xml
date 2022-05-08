@@ -14,7 +14,7 @@
 	<name>reward-dining</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>17</java.version>
 		<repackage.classifier/>
 		<spring-cloud.version>2021.0.1</spring-cloud.version>
 		<spring-native.version>0.11.4</spring-native.version>

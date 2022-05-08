@@ -35,8 +35,7 @@ class JdbcRewardRepositoryTests {
 	public void testCreateReward() {
 		Dining dining = Dining.createDining("100.00", "1234123412341234", "0123456789");
 
-		Account account = new Account("1", "Keith and Keri Donald");
-		account.setId(0L);
+		Account account = new Account(0L,"1", "Keith and Keri Donald");
 		account.addBeneficiary("Annabelle", Percentage.valueOf("50%"));
 		account.addBeneficiary("Corgan", Percentage.valueOf("50%"));
 

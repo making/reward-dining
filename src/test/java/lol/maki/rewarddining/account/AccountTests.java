@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AccountTests {
-	private Account account = new Account("1", "Keith and Keri Donald");
+	private Account account = new Account(null, "1", "Keith and Keri Donald");
 
 	@Test
 	void accountIsValid() {

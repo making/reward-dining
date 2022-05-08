@@ -2,6 +2,8 @@ package lol.maki.rewarddining.account.web;
 
 import java.util.stream.Collectors;
 
+import am.ik.yavi.core.ConstraintViolations;
+import am.ik.yavi.core.Validated;
 import lol.maki.rewarddining.account.Account;
 import lol.maki.rewarddining.account.AccountManager;
 import lol.maki.rewarddining.account.Beneficiary;
@@ -9,9 +11,9 @@ import lol.maki.rewarddining.account.Beneficiary;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
@@ -50,7 +52,7 @@ public class AccountController {
 	 */
 	@GetMapping("/accountDetails")
 	public String getAccountDetails(@RequestParam("id") long id, Model model) {
-		model.addAttribute("account", this.accountManager.getAccount(id));
+		model.addAttribute("account", AccountForm.fromAccount(this.accountManager.getAccount(id)));
 		return "accountDetails";
 	}
 
@@ -67,24 +69,22 @@ public class AccountController {
 
 	@GetMapping("/editAccount")
 	public String getEditAccount(@RequestParam("id") long id, Model model) {
-		model.addAttribute("account", this.accountManager.getAccount(id));
+		model.addAttribute("account", AccountForm.fromAccount(this.accountManager.getAccount(id)));
 		return "editAccount";
 	}
 
 	@PostMapping("/editAccount")
-	public String postEditAccount(Account account, BindingResult bindingResult, SessionStatus status, RedirectAttributes attributes, Model model) {
-		this.validateAccount(account, bindingResult);
-		if (bindingResult.hasErrors()) {
+	public String postEditAccount(@ModelAttribute("account") AccountForm form, BindingResult bindingResult, SessionStatus status, RedirectAttributes attributes, Model model) {
+		final Validated<Account> validated = form.toAccount();
+		return validated.fold(errors -> {
+			ConstraintViolations.of(errors).apply(bindingResult::rejectValue);
 			model.addAttribute("fieldErrors", bindingResult.getFieldErrors().stream().collect(Collectors.groupingBy(FieldError::getField)));
 			return "editAccount";
-		}
-		this.accountManager.update(account);
-		status.setComplete();
-		attributes.addAttribute("id", account.getId());
-		return "redirect:/accountDetails";
-	}
-
-	void validateAccount(Account account, Errors errors) {
-		Account.validator.validate(account).apply(errors::rejectValue);
+		}, account -> {
+			this.accountManager.update(account);
+			status.setComplete();
+			attributes.addAttribute("id", account.getId());
+			return "redirect:/accountDetails";
+		});
 	}
 }

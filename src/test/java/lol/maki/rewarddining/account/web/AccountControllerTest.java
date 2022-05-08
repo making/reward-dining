@@ -2,20 +2,21 @@ package lol.maki.rewarddining.account.web;
 
 import java.util.List;
 
+import am.ik.yavi.core.ConstraintViolation;
+import am.ik.yavi.core.ConstraintViolations;
+import am.ik.yavi.core.Validated;
 import lol.maki.rewarddining.account.Account;
 import lol.maki.rewarddining.account.AccountManager;
 import lol.maki.rewarddining.account.StubAccountManager;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.ui.ExtendedModelMap;
-import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
 import org.springframework.web.bind.support.SimpleSessionStatus;
 import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -32,7 +33,7 @@ class AccountControllerTest {
 	void getAccountDetails() {
 		ExtendedModelMap model = new ExtendedModelMap();
 		controller.getAccountDetails(VALID_ACCOUNT_ID, model);
-		Account account = (Account) model.get("account");
+		AccountForm account = (AccountForm) model.get("account");
 		assertNotNull(account);
 		assertEquals(Long.valueOf(0), account.getId());
 	}
@@ -59,47 +60,68 @@ class AccountControllerTest {
 
 	@Test
 	void validateAllValid() {
-		Account account = new Account("123456789", "Ben");
-		Errors errors = new BindException(account, "account");
-		controller.validateAccount(account, errors);
-		assertEquals(0, errors.getErrorCount(), "No errors should be registered");
+		final Validated<Account> validated = new AccountForm(0L, "123456789", "Ben").toAccount();
+		assertThat(validated.isValid()).isTrue();
 	}
 
 	@Test
 	void validateInvalidName() {
-		Account account = new Account("1", "");
-		Errors errors = new BindException(account, "account");
-		controller.validateAccount(account, errors);
-		assertEquals(2, errors.getErrorCount(), "One error should be registered");
-		FieldError error = errors.getFieldError("name");
-		assertNotNull(error, "Should have an error registred for the name field");
-		assertEquals("charSequence.notBlank", error.getCode(), "Should have registered an empty value error");
+		final Validated<Account> validated = new AccountForm(0L, "123456789", "").toAccount();
+		assertThat(validated.isValid()).isFalse();
+		final ConstraintViolations violations = validated.errors();
+		assertThat(violations).hasSize(1);
+		final ConstraintViolation violation = violations.get(0);
+		assertThat(violation.name()).isEqualTo("name");
+		assertThat(violation.messageKey()).isEqualTo("charSequence.notBlank");
 	}
 
 	@Test
 	void validateInvalidNumber() {
-		Account account = new Account("", "Ben");
-		Errors errors = new BindException(account, "account");
-		controller.validateAccount(account, errors);
-		assertEquals(2, errors.getErrorCount(), "One error should be registered");
-		FieldError error = errors.getFieldError("number");
-		assertNotNull(error, "Should have an error registred for the number field");
-		assertEquals("charSequence.notBlank", error.getCode(), "Should have registered an empty value error");
+		final Validated<Account> validated = new AccountForm(0L, "", "Ben").toAccount();
+		assertThat(validated.isValid()).isFalse();
+		final ConstraintViolations violations = validated.errors();
+		assertThat(violations).hasSize(2);
+		{
+			final ConstraintViolation violation = violations.get(0);
+			assertThat(violation.name()).isEqualTo("number");
+			assertThat(violation.messageKey()).isEqualTo("charSequence.notBlank");
+		}
+		{
+			final ConstraintViolation violation = violations.get(1);
+			assertThat(violation.name()).isEqualTo("number");
+			assertThat(violation.messageKey()).isEqualTo("charSequence.pattern");
+			assertThat(violation.message()).isEqualTo("\"number\" must be a 9 digit number");
+		}
 	}
 
 	@Test
 	void validateAllInvalid() {
-		Account account = new Account(null, null);
-		Errors errors = new BindException(account, "account");
-		controller.validateAccount(account, errors);
-		assertEquals(2, errors.getErrorCount(), "Two errors should be registered");
+		final Validated<Account> validated = new AccountForm(null, null, null).toAccount();
+		assertThat(validated.isValid()).isFalse();
+		final ConstraintViolations violations = validated.errors();
+		assertThat(violations).hasSize(3);
+		{
+			final ConstraintViolation violation = violations.get(0);
+			assertThat(violation.name()).isEqualTo("id");
+			assertThat(violation.messageKey()).isEqualTo("object.notNull");
+		}
+		{
+			final ConstraintViolation violation = violations.get(1);
+			assertThat(violation.name()).isEqualTo("number");
+			assertThat(violation.messageKey()).isEqualTo("charSequence.notBlank");
+		}
+		{
+			final ConstraintViolation violation = violations.get(2);
+			assertThat(violation.name()).isEqualTo("name");
+			assertThat(violation.messageKey()).isEqualTo("charSequence.notBlank");
+		}
 	}
 
 	@Test
 	void editAccount() throws Exception {
 		ExtendedModelMap model = new ExtendedModelMap();
 		controller.getEditAccount(VALID_ACCOUNT_ID, model);
-		Account account = (Account) model.get("account");
+		AccountForm account = (AccountForm) model.get("account");
 		assertNotNull(account);
 		assertEquals(Long.valueOf(0), account.getId());
 	}
@@ -108,7 +130,7 @@ class AccountControllerTest {
 	void successfulPost() throws Exception {
 		ExtendedModelMap model = new ExtendedModelMap();
 		controller.getEditAccount(VALID_ACCOUNT_ID, model);
-		Account account = (Account) model.get("account");
+		AccountForm account = (AccountForm) model.get("account");
 		account.setName("Ben");
 		account.setNumber("987654321");
 		BindingResult br = new MapBindingResult(model, "account");
@@ -126,7 +148,7 @@ class AccountControllerTest {
 	void unsuccessfulPost() throws Exception {
 		ExtendedModelMap model = new ExtendedModelMap();
 		controller.getEditAccount(VALID_ACCOUNT_ID, model);
-		Account account = (Account) model.get("account");
+		AccountForm account = (AccountForm) model.get("account");
 		account.setName("");
 		account.setNumber("");
 		BindingResult br = new MapBindingResult(model, "account");

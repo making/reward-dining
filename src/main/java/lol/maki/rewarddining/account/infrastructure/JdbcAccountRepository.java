@@ -166,8 +166,7 @@ public class JdbcAccountRepository implements AccountRepository {
 					}
 					final String number = rs.getString("ACCOUNT_NUMBER");
 					final String name = rs.getString("ACCOUNT_NAME");
-					lastAccount = new Account(number, name);
-					lastAccount.setId(accountId);
+					lastAccount = new Account(accountId, number, name);
 				}
 				if (rs.getString("BENEFICIARY_NAME") != null) {
 					lastAccount.restoreBeneficiary(mapBeneficiary(rs));

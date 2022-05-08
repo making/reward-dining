@@ -34,10 +34,9 @@ public class StubAccountManager implements AccountManager {
 	private final Logger log = LoggerFactory.getLogger(StubAccountManager.class);
 
 	public StubAccountManager() {
-		Account account = new Account("123456789", "Keith and Keri Donald");
+		Account account = new Account(0L, "123456789", "Keith and Keri Donald");
 		account.addBeneficiary("Annabelle", Percentage.valueOf("50%"));
 		account.addBeneficiary("Corgan", Percentage.valueOf("50%"));
-		account.setId(0L);
 		account.getBeneficiary("Annabelle").setId(0L);
 		account.getBeneficiary("Corgan").setId(1L);
 		accountsById.put(0L, account);

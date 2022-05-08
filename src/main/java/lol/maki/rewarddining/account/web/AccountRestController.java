@@ -5,6 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import am.ik.yavi.core.ConstraintGroup;
+import am.ik.yavi.core.ConstraintViolations;
+import am.ik.yavi.core.ConstraintViolationsException;
+import am.ik.yavi.core.Validated;
 import lol.maki.rewarddining.account.Account;
 import lol.maki.rewarddining.account.AccountManager;
 import lol.maki.rewarddining.account.Beneficiary;
@@ -65,10 +69,10 @@ public class AccountRestController {
 	 * response.
 	 */
 	@PostMapping(value = "/accounts")
-	@ResponseStatus(HttpStatus.CREATED) // 201
-	public ResponseEntity<Void> createAccount(@RequestBody Account newAccount) {
-		Account account = accountManager.save(newAccount);
-		return entityWithLocation(account.getId());
+	public ResponseEntity<?> createAccount(@RequestBody AccountRequest newAccount) {
+		final Account account = newAccount.toAccount().orElseThrow(ConstraintViolationsException::new);
+		final Long id = accountManager.save(account).getId();
+		return entityWithLocation(id);
 	}
 
 	/**
@@ -159,6 +163,15 @@ public class AccountRestController {
 	public void handleAlreadyExists(Exception ex) {
 		log.error("Exception is: ", ex);
 		// return empty 409
+	}
+
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler({ ConstraintViolationsException.class })
+	public Object handleConstraintViolations(ConstraintViolationsException ex) {
+		return Map.of(
+				"status", HttpStatus.BAD_REQUEST.value(),
+				"error", HttpStatus.BAD_REQUEST.getReasonPhrase(),
+				"details", ex.violations().details());
 	}
 
 	/**

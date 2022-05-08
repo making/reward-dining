@@ -23,7 +23,7 @@ public class StubAccountRepository implements AccountRepository {
 	private Map<String, Account> accountsByCreditCard = new HashMap<String, Account>();
 
 	public StubAccountRepository() {
-		Account account = new Account("123456789", "Keith and Keri Donald");
+		Account account = new Account(null, "123456789", "Keith and Keri Donald");
 		account.addBeneficiary("Annabelle", Percentage.valueOf("50%"));
 		account.addBeneficiary("Corgan", Percentage.valueOf("50%"));
 		accountsByCreditCard.put("1234123412341234", account);

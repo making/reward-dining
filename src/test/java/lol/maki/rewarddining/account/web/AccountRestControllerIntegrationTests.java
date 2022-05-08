@@ -3,9 +3,11 @@ package lol.maki.rewarddining.account.web;
 import java.net.URI;
 import java.util.Random;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lol.maki.rewarddining.account.Account;
 import lol.maki.rewarddining.account.Beneficiary;
 import lol.maki.rewarddining.account.Percentage;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,7 +56,7 @@ class AccountRestControllerIntegrationTests {
 		String url = "/accounts";
 		// use a unique number to avoid conflicts
 		String number = String.format("12345%4d", random.nextInt(10000));
-		Account account = new Account(number, "John Doe");
+		Account account = new Account(null, number, "John Doe");
 		account.addBeneficiary("Jane Doe");
 		URI newAccountLocation = restTemplate.postForLocation(url, account);
 		System.out.println(newAccountLocation);
@@ -66,6 +69,22 @@ class AccountRestControllerIntegrationTests {
 
 		assertEquals(accountBeneficiary.getName(), retrievedAccountBeneficiary.getName());
 		assertNotNull(retrievedAccount.getId());
+	}
+
+	@Test
+	public void createAccountBadRequest() {
+		String url = "/accounts";
+		// use a unique number to avoid conflicts
+		Account account = new Account(null, "", "");
+		final ResponseEntity<JsonNode> response = restTemplate.postForEntity(url, account, JsonNode.class);
+		assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+		final JsonNode body = response.getBody();
+		assertThat(body).isNotNull();
+		assertThat(body.get("status").asInt()).isEqualTo(400);
+		assertThat(body.get("details").size()).isEqualTo(3);
+		assertThat(body.get("details").get(0).get("defaultMessage").asText()).isEqualTo("\"number\" must not be blank");
+		assertThat(body.get("details").get(1).get("defaultMessage").asText()).isEqualTo("\"number\" must be a 9 digit number");
+		assertThat(body.get("details").get(2).get("defaultMessage").asText()).isEqualTo("\"name\" must not be blank");
 	}
 
 	@Test

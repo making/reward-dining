@@ -29,7 +29,7 @@ public class RestaurantTests {
 		restaurant.setBenefitPercentage(Percentage.valueOf("8%"));
 		restaurant.setBenefitAvailabilityPolicy(new StubBenefitAvailabilityPolicy(true));
 		// configure supporting objects needed by the restaurant
-		account = new Account("123456789", "Keith and Keri Donald");
+		account = new Account(null, "123456789", "Keith and Keri Donald");
 		account.addBeneficiary("Annabelle");
 		dining = Dining.createDining("100.00", "1234123412341234", "1234567890");
 	}

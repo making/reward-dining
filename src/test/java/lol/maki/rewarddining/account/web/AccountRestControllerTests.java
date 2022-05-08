@@ -37,7 +37,7 @@ class AccountRestControllerTests {
 
 	@Test
 	void testCreateAccount() {
-		Account newAccount = new Account("11223344", "Test");
+		AccountRequest newAccount = new AccountRequest("112233440", "Test", List.of());
 
 		// ServletUriComponentsBuilder expects to find the HttpRequest in the
 		// current thread (Spring MVC does this for you). For our test, we need
